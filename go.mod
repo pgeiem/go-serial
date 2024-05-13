@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/creack/goselect v0.1.2
+	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/sys v0.17.0
 )
