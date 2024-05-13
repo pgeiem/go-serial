@@ -16,6 +16,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"go.bug.st/serial/unixutils"
 	"golang.org/x/sys/unix"
 )
@@ -68,7 +69,9 @@ func (port *unixPort) Read(p []byte) (int, error) {
 		deadline = time.Now().Add(port.readTimeout)
 	}
 
+	logrus.Info("serial: before NewFDSet", port.handle, port.closeSignal.ReadFD())
 	fds := unixutils.NewFDSet(port.handle, port.closeSignal.ReadFD())
+	logrus.Info("serial: after NewFDSet")
 	for {
 		timeout := time.Duration(-1)
 		if port.readTimeout != NoTimeout {
@@ -226,6 +229,11 @@ func nativeOpen(portName string, mode *Mode) (*unixPort, error) {
 		handle:      h,
 		opened:      1,
 		readTimeout: NoTimeout,
+	}
+
+	logrus.Info("serial: file handle is", h)
+	if h >= 1024 {
+		logrus.Warn("serial: file handle too big for select", h)
 	}
 
 	// Setup serial port
